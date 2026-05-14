@@ -1,27 +1,87 @@
 package dev.aditya.productcatalogservice.Controller;
 
+import dev.aditya.productcatalogservice.DTO.ProductRequestDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductServices;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
-    @Autowired
-    ProductServices productService;
+    private ProductServices productServices;
 
-    @GetMapping("/products/{id}")
+    ProductController(@Qualifier("FakeStoreProductService") ProductServices productServices)
+    {
+        this.productServices = productServices;
+    }
+
+
+    @GetMapping("/{id}")
     public ProductResponseDTO getProductById(@PathVariable("id") long prodId)
     {
-        Product productModel = productService.getProductById(prodId);
-        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-        productResponseDTO.buildDTO(productModel);
-        return productResponseDTO;
+        Product product = productServices.getProductById(prodId);
+        return product.convertToResponseDTO();
     }
+
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts()
+    {
+
+        return new ResponseEntity<>( productServices.getAllProducts()
+                                              .stream()
+                                              .map(product -> product.convertToResponseDTO())
+                                              .toList()
+                            ,HttpStatus.OK);
+    }
+
+
+
+
+    //Response Entity -> A wrapper class which contains -> body Object + HTTP Status code + HTTP Header
+    // our proxy successfully forwards the request and displays the result(be it null or successful), so it'll always show status code as 200 but that might not be the actual output.
+    // so to get proper response from 3rd party API we need to wrap it in Response Entity. So that we can manually set headers and change the status code dynamically based on logic
+    @PostMapping
+    public ResponseEntity<ProductResponseDTO> createNewProduct(@RequestBody ProductRequestDTO productRequestDTO)
+    {
+        return new ResponseEntity<>(productServices.createNewProduct(productRequestDTO.getName(),
+                                                                    productRequestDTO.getDesc(),
+                                                                    productRequestDTO.getImageURL(),
+                                                                    productRequestDTO.getPrice(),
+                                                                    productRequestDTO.getCategory()
+                                                                    )
+                                                    .convertToResponseDTO(),
+                                    HttpStatus.OK);
+    }
+
+
+
+
+    //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
+    @DeleteMapping("/{Id}")
+    public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id)
+    {
+        productServices.deleteProductById(id);
+        return new ResponseEntity<>("Object Deleted Successfully",HttpStatus.OK);
+    }
+
+
+
+
+    /* This is GetMapping for Query Parameter
+    @GetMapping("/productId")
+    public ProductResponseDTO getProductId(@RequestParam("prodId") long prodId)
+    {
+        return null;
+    }
+    */
 
 }
