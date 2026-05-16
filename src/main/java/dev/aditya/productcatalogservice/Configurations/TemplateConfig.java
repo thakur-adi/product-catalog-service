@@ -18,9 +18,10 @@ public class TemplateConfig {
 
     @Bean(name = "RestClient")
     public RestClient createRestClient(ServerProperties serverProperties){
-        return RestClient.builder()
-                .baseUrl("http://localhost:".concat(String.valueOf(serverProperties.getPort())))
-                .build();
+        return RestClient.create();
+//                .builder()
+//                .baseUrl("http://localhost:".concat(String.valueOf(serverProperties.getPort())))
+//                .build();
         }
 
 }

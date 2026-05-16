@@ -34,7 +34,8 @@ public class StorageProductService implements ProductServices {
     }
 
     @Override
-    public void deleteProductById(long prodId) {
+    public Product deleteProductById(long prodId) {
 
+        return null;
     }
 }

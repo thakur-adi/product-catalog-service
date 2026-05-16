@@ -2,6 +2,7 @@ package dev.aditya.productcatalogservice.Controller;
 
 import dev.aditya.productcatalogservice.DTO.ProductRequestDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
+import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductServices;
@@ -35,7 +36,6 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts()
     {
-
         return new ResponseEntity<>( productServices.getAllProducts()
                                               .stream()
                                               .map(product -> product.convertToResponseDTO())
@@ -69,14 +69,28 @@ public class ProductController {
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
-        productServices.deleteProductById(id);
+        Product product =productServices.deleteProductById(id);
+        if(product == null)
+        {
+            throw new InternalError("Some Internal issue Encountered. please try again later");
+        }
         return new ResponseEntity<>("Object Deleted Successfully",HttpStatus.OK);
     }
 
 
+    //To handle if Client tries to bypass without inputting any id. Spring catches it on its own and throws an error
+    // Spring never lets it reach service layer. But this way we can give out a particular response instead of an Error
+    @RequestMapping(value = "/",method = {RequestMethod.GET,RequestMethod.DELETE,RequestMethod.PUT})
+    //@DeleteMapping("/")
+    public ResponseEntity<String> handleMissingId()
+    {
+        throw new ProductIdMissingException("Please enter a valid Product Id");
+    }
+
 
 
     /* This is GetMapping for Query Parameter
+    "https://fakestoreApi.com/products?prodId={id}"
     @GetMapping("/productId")
     public ProductResponseDTO getProductId(@RequestParam("prodId") long prodId)
     {

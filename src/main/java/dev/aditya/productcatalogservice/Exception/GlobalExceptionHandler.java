@@ -20,7 +20,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<String> handleNullPointerException(NullPointerException e)
     {
-        return new ResponseEntity<>("",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Null Pointer Encountered",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InternalError.class)
+    public ResponseEntity<String> handleInternalError(InternalError e)
+    {
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ProductIdMissingException.class)
+    public ResponseEntity<String> handleProductIdMissingException(ProductIdMissingException e)
+    {
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
 }
