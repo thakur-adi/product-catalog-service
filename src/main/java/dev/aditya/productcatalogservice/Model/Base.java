@@ -9,5 +9,4 @@ import lombok.Setter;
 public abstract class Base {
     private long id;
     private String name;
-    private String description;
 }
