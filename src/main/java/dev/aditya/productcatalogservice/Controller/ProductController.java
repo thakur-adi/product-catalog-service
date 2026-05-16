@@ -2,6 +2,7 @@ package dev.aditya.productcatalogservice.Controller;
 
 import dev.aditya.productcatalogservice.DTO.ProductRequestDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
+import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductServices;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,10 +26,9 @@ public class ProductController {
 
 
     @GetMapping("/{id}")
-    public ProductResponseDTO getProductById(@PathVariable("id") long prodId)
-    {
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") long prodId) throws ProductNotFoundException {
         Product product = productServices.getProductById(prodId);
-        return product.convertToResponseDTO();
+        return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.OK);
     }
 
 
@@ -49,6 +49,7 @@ public class ProductController {
     //Response Entity -> A wrapper class which contains -> body Object + HTTP Status code + HTTP Header
     // our proxy successfully forwards the request and displays the result(be it null or successful), so it'll always show status code as 200 but that might not be the actual output.
     // so to get proper response from 3rd party API we need to wrap it in Response Entity. So that we can manually set headers and change the status code dynamically based on logic
+    //So I have converted all the return types to a ResponseEntity
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createNewProduct(@RequestBody ProductRequestDTO productRequestDTO)
     {
@@ -67,8 +68,7 @@ public class ProductController {
 
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
-    public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id)
-    {
+    public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
         productServices.deleteProductById(id);
         return new ResponseEntity<>("Object Deleted Successfully",HttpStatus.OK);
     }

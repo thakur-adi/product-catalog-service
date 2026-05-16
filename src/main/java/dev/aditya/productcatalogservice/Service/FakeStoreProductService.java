@@ -1,6 +1,7 @@
 package dev.aditya.productcatalogservice.Service;
 
 import dev.aditya.productcatalogservice.DTO.FakeStoreDTO;
+import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Category;
 import dev.aditya.productcatalogservice.Model.Product;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,13 @@ public class FakeStoreProductService implements ProductServices {
 
 
     @Override
-    public Product getProductById(long prodId)
-    {
-        FakeStoreDTO fakeStoreDTO = restTemplate.getForObject(baseURL+"/{id}", FakeStoreDTO.class, prodId);
+    public Product getProductById(long prodId) throws ProductNotFoundException {
+        //we can also call getForEntity() and get the status from there.
+        FakeStoreDTO fakeStoreDTO = restTemplate.getForObject(baseURL+"/"+prodId, FakeStoreDTO.class, prodId);
+        if (fakeStoreDTO==null)
+        {
+            throw  new ProductNotFoundException("Product doesn't Exist");
+        }
         return fakeStoreDTO.convertToProduct();
     }
 
@@ -58,8 +63,9 @@ public class FakeStoreProductService implements ProductServices {
     }
 
     @Override
-    public void deleteProductById(long prodId) {
-        restTemplate.delete(baseURL+"/{id}",prodId);
+    public void deleteProductById(long prodId) throws ProductNotFoundException{
+        Product product = getProductById(prodId);
+        restTemplate.delete(baseURL+"/"+prodId,prodId);
     }
     
     
