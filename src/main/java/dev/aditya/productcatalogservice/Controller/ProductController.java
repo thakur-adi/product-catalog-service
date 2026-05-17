@@ -6,6 +6,7 @@ import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductServices;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -18,9 +19,11 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
+//    @Autowired
+//    @Qualifier("StorageProductService")
     private ProductServices productServices;
 
-    ProductController(@Qualifier("FakeStoreProductService") ProductServices productServices)
+    ProductController(@Qualifier("StorageProductService") ProductServices productServices)
     {
         this.productServices = productServices;
     }
@@ -33,9 +36,9 @@ public class ProductController {
     }
 
 
+
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts()
-    {
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() throws ProductNotFoundException {
         return new ResponseEntity<>( productServices.getAllProducts()
                                               .stream()
                                               .map(product -> product.convertToResponseDTO())
@@ -51,13 +54,12 @@ public class ProductController {
     // so to get proper response from 3rd party API we need to wrap it in Response Entity. So that we can manually set headers and change the status code dynamically based on logic
     //So I have converted all the return types to a ResponseEntity
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> createNewProduct(@RequestBody ProductRequestDTO productRequestDTO)
-    {
-        return new ResponseEntity<>(productServices.createNewProduct(productRequestDTO.getName(),
-                                                                    productRequestDTO.getDesc(),
-                                                                    productRequestDTO.getImageURL(),
+    public ResponseEntity<ProductResponseDTO> createNewProduct(@RequestBody ProductRequestDTO productRequestDTO) {
+        return new ResponseEntity<>(productServices.createNewProduct(productRequestDTO.getProductName(),
+                                                                    productRequestDTO.getDescription(),
+                                                                    productRequestDTO.getImageUrl(),
                                                                     productRequestDTO.getPrice(),
-                                                                    productRequestDTO.getCategory()
+                                                                    productRequestDTO.getCategoryName()
                                                                     )
                                                     .convertToResponseDTO(),
                                     HttpStatus.OK);
@@ -69,13 +71,14 @@ public class ProductController {
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
-        Product product =productServices.deleteProductById(id);
-        if(product == null)
+        //Product product =productServices.deleteProductById(id);
+        if(!productServices.deleteProductById(id))
         {
             throw new InternalError("Some Internal issue Encountered. please try again later");
         }
         return new ResponseEntity<>("Object Deleted Successfully",HttpStatus.OK);
     }
+
 
 
     //To handle if Client tries to bypass without inputting any id. Spring catches it on its own and throws an error

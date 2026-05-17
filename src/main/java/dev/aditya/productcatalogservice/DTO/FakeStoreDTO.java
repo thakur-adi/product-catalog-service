@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FakeStoreDTO {
+    //These var names should match exactly like the one being sent by the other server.
     private Long id;
     private String title;
     private String description;
@@ -24,7 +25,9 @@ public class FakeStoreDTO {
         productModel.setPrice(price);
         productModel.setName(title);
         productModel.setDescription(description);
-        productModel.setCategory(new Category(category));
+        Category categoryModel = new Category();
+        categoryModel.setName(category);
+        productModel.setCategory(categoryModel);
         productModel.setImageUrl(image);
         return productModel;
     }

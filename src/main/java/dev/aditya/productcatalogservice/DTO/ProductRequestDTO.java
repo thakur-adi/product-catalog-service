@@ -7,9 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductRequestDTO {
-    String name;
-    String desc;
-    String imageURL;
-    Category category;
+    String productName;
+    String description;
+    String imageUrl;
+    String categoryName;
     double price;
 }

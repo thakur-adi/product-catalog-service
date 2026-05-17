@@ -12,27 +12,34 @@ Helps us by eliminating unnecessary try{}catch{} code everywhere, Spring handles
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException e){
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
+    //Pre-Defined Exceptions
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<String> handleNullPointerException(NullPointerException e)
     {
-        return new ResponseEntity<>("Null Pointer Encountered",HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Null encountered. Please try again later!",HttpStatus.NOT_IMPLEMENTED);
     }
 
     @ExceptionHandler(InternalError.class)
     public ResponseEntity<String> handleInternalError(InternalError e)
     {
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Internal server issue encountered. Please try again later!",HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+    //Custom Exceptions
 
     @ExceptionHandler(ProductIdMissingException.class)
     public ResponseEntity<String> handleProductIdMissingException(ProductIdMissingException e)
     {
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
+
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException e){
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 
 }

@@ -2,23 +2,29 @@ package dev.aditya.productcatalogservice.Model;
 
 import dev.aditya.productcatalogservice.DTO.FakeStoreDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
 public class Product extends Base{
     private String description;
     private String imageUrl;
     private Double price;
+
+    @ManyToOne
     private Category category;
+
 
     //Product to ProductResponseDTO Mapper
     public ProductResponseDTO convertToResponseDTO()
     {
         ProductResponseDTO productResponseDTO = new ProductResponseDTO();
         productResponseDTO.setName(this.getName());
-        productResponseDTO.setDesc(this.getDescription());
+        productResponseDTO.setDescription(this.getDescription());
         productResponseDTO.setImageUrl(this.getImageUrl());
         productResponseDTO.setPrice(this.getPrice());
         productResponseDTO.setCategory(this.getCategory());

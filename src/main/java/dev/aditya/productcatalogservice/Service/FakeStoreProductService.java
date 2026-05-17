@@ -18,7 +18,7 @@ import java.util.List;
 @Service("FakeStoreProductService")
 public class FakeStoreProductService implements ProductServices {
 
-    RestTemplate restTemplate;
+    //RestTemplate restTemplate;
     RestClient restClient;
     private final String baseURL = "https://fakestoreapi.com/products";
 
@@ -54,7 +54,7 @@ public class FakeStoreProductService implements ProductServices {
 
         if (fakeStoreDTO==null)
         {
-            throw  new ProductNotFoundException("Product doesn't Exist");
+            throw  new ProductNotFoundException();
         }
         return fakeStoreDTO.convertToProduct();
     }
@@ -62,8 +62,7 @@ public class FakeStoreProductService implements ProductServices {
 
 
     @Override
-    public List<Product> getAllProducts()
-    {
+    public List<Product> getAllProducts() throws ProductNotFoundException {
        FakeStoreDTO[] fakeStoreDTOS = restClient.get()
                                                .uri(baseURL)
                                                .retrieve()
@@ -73,7 +72,7 @@ public class FakeStoreProductService implements ProductServices {
 
         if (fakeStoreDTOS == null || fakeStoreDTOS.length==0)
         {
-            throw new NullPointerException("No Products exist yet");
+            throw new ProductNotFoundException("No Products exist yet");
         }
        return Arrays.stream(fakeStoreDTOS)
                     .map(fakeStoreDTO -> fakeStoreDTO.convertToProduct())
@@ -84,13 +83,13 @@ public class FakeStoreProductService implements ProductServices {
 
 
     @Override
-    public Product createNewProduct(String name, String desc, String imageURL, double price, Category category)
+    public Product createNewProduct(String productName, String desc, String imageURL, double price, String categoryName)
     {
         ResponseEntity<FakeStoreDTO> fakeStoreDTOResponseEntity= restClient
                                                                 .post()
                                                                 .uri(baseURL) // <--- This variable is for the URL template
                                                                 //This is the Http request Body. Always pass the object in body() and not it uri unlike rest template.
-                                                                .body(createProductFromParams(name,desc,imageURL,price,category)// This is used in POST and PUT.
+                                                                .body(createProductFromParams(productName,desc,imageURL,price,categoryName)// This is used in POST and PUT.
                                                                      .convertToFakeStoreDTO())
                                                                 .retrieve()
                                                                 .toEntity(FakeStoreDTO.class);
@@ -107,20 +106,24 @@ public class FakeStoreProductService implements ProductServices {
                 return fakeStoreDTOResponseEntity.getBody().convertToProduct();
             }
             else {
-                throw new InternalError("Couldn't create the object. Internal server issue encountered. Please try again later!");
+                throw new InternalError();
             }
         }
         else
         {
-            throw new NullPointerException("Couldn't create the object");
+            throw new NullPointerException();
         }
     }
 
 
 
     @Override
-    public Product deleteProductById(long prodId) throws ProductNotFoundException{
+    public Boolean deleteProductById(long prodId) throws ProductNotFoundException{
         Product product = getProductById(prodId);
+        if(product==null)
+        {
+            throw new ProductNotFoundException();
+        }
         ResponseEntity<FakeStoreDTO> fakeStoreDTOResponseEntity=restClient.delete()
                                                                           .uri(baseURL+"/"+prodId) //No need to pass id twice, Spring can get confused
                                                                           .retrieve()
@@ -132,20 +135,21 @@ public class FakeStoreProductService implements ProductServices {
         {
             if(fakeStoreDTOResponseEntity.getStatusCode().equals(HttpStatus.OK))
             {
-                return fakeStoreDTOResponseEntity.getBody().convertToProduct();
+                //return fakeStoreDTOResponseEntity.getBody().convertToProduct();
+                return true;
             }
             else
             {
                 if(fakeStoreDTOResponseEntity.getStatusCode().is4xxClientError()) {
-                    throw new ProductNotFoundException("Product doesn't Exist");
+                    throw new ProductNotFoundException();
                 }
                 else {
-                    throw new InternalError("Some internal Error occured");
+                    throw new InternalError();
                 }
             }
         }
         else {
-            throw new NullPointerException("Couldn't Delete any product, Null Pointer encountered");
+            throw new NullPointerException();
         }
 
 
@@ -154,15 +158,15 @@ public class FakeStoreProductService implements ProductServices {
     
 
  //Helper Method for creating a model Object
-    private Product createProductFromParams(String name, String desc, String imageURL, double price, Category category)
+    private Product createProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
     {
         Product product = new Product();
-        product.setId(100l);
-        product.setName(name);
+        product.setId(100);
+        product.setName(productName);
         product.setDescription(desc);
         product.setImageUrl(imageURL);
         product.setPrice(price);
-        product.setCategory(category);
+        product.setCategory(new Category());
         return product;  
     }
 }
