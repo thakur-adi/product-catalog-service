@@ -25,26 +25,27 @@ public class StorageProductService implements ProductServices {
     }
 
 
+
+
     @Override
     public Product getProductById(long prodId) throws ProductNotFoundException {
-        Optional<Product> optionalProduct =productRepo.findById(prodId);
-        if(optionalProduct.isEmpty())
-        {
-            throw new ProductNotFoundException();
-        }
-        else {
-        return optionalProduct.get();}
+        return getValidProduct(productRepo.findById(prodId));
     }
+
+
 
 
     @Override
     public List<Product> getAllProducts() throws ProductNotFoundException {
-        List<Product> products = productRepo.findAll();
+        List<Product> products = productRepo.findAll(); //Custom Query for finding active products not working for some reason. Will look into it later.
         if(products.size()==0)
         {
             throw new ProductNotFoundException("No Products exist yet.");
         }
-        return List.copyOf(products); //for security purpose
+        //for security purpose we send a copy of the list instead of the original list.
+        return  List.copyOf(products.stream()
+                                    .filter(product -> product.getStatus() == ModelStatus.ACTIVE) //using '==' over '.equals()' as the latter can lead to NPE if status doesn't exist.
+                                    .toList());
     }
 
 
@@ -60,25 +61,27 @@ public class StorageProductService implements ProductServices {
         return productRepo.save(product);
     }
 
+
+
     @Override
     public Boolean deleteProductById(long prodId) throws ProductNotFoundException {
-       Optional<Product> optionalProduct = productRepo.findById(prodId);
-        if(optionalProduct.isEmpty())
-        {
-            throw new ProductNotFoundException();
-        }
-        else if (optionalProduct.get().getStatus().equals(ModelStatus.DELETED)) {
-            throw new ProductNotFoundException();
-        }
-        optionalProduct.get().setStatus(ModelStatus.DELETED);
-        return true;
+            Product validProduct= getValidProduct(productRepo.findById(prodId));
+            validProduct.setStatus(ModelStatus.DELETED);
+            productRepo.save(validProduct);
+            return true;
+
     }
+
+
+
+
 
 
 
     //Helper Method for creating a Product Model Object
     private Product createNewProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
     {
+        //try to move it to a builder class next
         Product product = new Product();
         product.setName(productName);
         product.setDescription(desc);
@@ -89,6 +92,7 @@ public class StorageProductService implements ProductServices {
         Optional<Category> optionalCategory = categoryRepo.findbyName(categoryName);
         if(optionalCategory.isEmpty())
         {
+           //try to move this to a builder
            Category category = new Category();
            category.setName(categoryName);
            categoryRepo.save(category);
@@ -99,5 +103,19 @@ public class StorageProductService implements ProductServices {
         }
         //I fwe don't perform this product addition to the  table i.e. post/put api will fail.
         return product;
+    }
+
+
+
+    //This performs various checks on Product object before it gets sent to controller
+    private Product getValidProduct(Optional<Product> optionalProduct) throws ProductNotFoundException{
+        if(optionalProduct.isEmpty())
+        {
+            throw new ProductNotFoundException();
+        }
+        else if (optionalProduct.get().getStatus().equals(ModelStatus.DELETED)) {
+            throw new ProductNotFoundException();
+        }
+        return optionalProduct.get();
     }
 }

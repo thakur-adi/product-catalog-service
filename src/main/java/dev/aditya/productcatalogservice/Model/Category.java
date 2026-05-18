@@ -5,9 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 
@@ -31,7 +28,6 @@ public class Category extends Base{
 
 
    // This Constructor is added so that we can directly call Product.setCategory(new Category(name)) -> Check FakeStoreDTO
-
     public Category(String name) {
         super();
         this.setName(name);

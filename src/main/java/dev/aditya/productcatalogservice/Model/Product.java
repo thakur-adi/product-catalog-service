@@ -27,7 +27,8 @@ public class Product extends Base{
         productResponseDTO.setDescription(this.getDescription());
         productResponseDTO.setImageUrl(this.getImageUrl());
         productResponseDTO.setPrice(this.getPrice());
-        productResponseDTO.setCategory(this.getCategory());
+        productResponseDTO.setCategory(this.getCategory().getName());
+        productResponseDTO.setCreatedAt(this.getCreatedAt());
         return productResponseDTO;
     }
 

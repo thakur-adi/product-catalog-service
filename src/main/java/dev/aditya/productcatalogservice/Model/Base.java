@@ -20,7 +20,7 @@ public abstract class Base {
     private Date lastUpdatedAt;
     private Date createdAt;
 
-    @Enumerated(EnumType.STRING) //Without this the table stores the enm in Integer format -> Active =0,Deleted =1,Inactive=2 etc.
+    //@Enumerated(EnumType.STRING) //Without this the table stores the enm in Integer format -> Active =0,Deleted =1,Inactive=2 etc.
     //What if tomorrow the list becomes -> Archive,Active,Deleted,Inactive -> This won't change the mapping in the table. So the elements which were supposed to be Active will now become Archive.
     //Always store in string which is Human Readable.
     private ModelStatus status;

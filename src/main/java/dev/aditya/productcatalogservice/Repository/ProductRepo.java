@@ -2,7 +2,6 @@ package dev.aditya.productcatalogservice.Repository;
 
 import dev.aditya.productcatalogservice.Model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +23,7 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
 
     //This is used for mapping to Post/Put/Delete API.
     // As we update/create the product in the service all we need to do is save the object into the table.
+    //Its smart enough to understand whether we want to create a new product or update an existing one.
     @Override
     Product save(Product product);
 }

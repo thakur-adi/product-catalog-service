@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 public class TemplateConfig {
 
 
-    @Bean(name = "RestTemplate")
+    @Bean(name = "RestTemplate") //use this when you don't own the source code (like a third-party library) or need custom initialization logic. Otherwise, use @Component.
     public RestTemplate createRestTemplate(){
 
         return new RestTemplate();
