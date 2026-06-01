@@ -15,6 +15,6 @@ public interface ProductService {
     // "id" will be created inside this function, better to send in just properties and not set it to null or 0 by default first then overwrite.
     Product createNewProduct(String productName, String desc, String imageUrl, double price, String categoryName);
 
-    Boolean deleteProductById(long prodId)throws ProductNotFoundException ;
+    Product deleteProductById(long prodId)throws ProductNotFoundException ;
 
 }

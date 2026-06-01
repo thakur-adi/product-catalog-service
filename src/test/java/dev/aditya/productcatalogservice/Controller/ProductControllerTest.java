@@ -32,6 +32,7 @@ class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    //Since we are testing APIs and will be using mockMvc to perform an action and expect an o/p in json we need this to map json o/p to string for comparison.
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -61,11 +62,13 @@ class ProductControllerTest {
 
         when(productService.getProductById(1)).thenReturn(dummyProduct);
 
-        ProductResponseDTO dummyResponseDTO = dummyProduct.convertToResponseDTO();
+        ProductResponseDTO expectedResponseDTO = dummyProduct.convertToResponseDTO();
 
+        //Act & Assert
         mockMvc.perform(get("/products/{id}",1))
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(dummyResponseDTO)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponseDTO)));
     }
 
     @Test
@@ -105,10 +108,13 @@ class ProductControllerTest {
     void testDeleteProductByIdRunsSuccessfully() throws Exception {
         Product dummyProduct = createNewDummyProduct("Dummy for Delete() Method");
 
-        when(productService.deleteProductById(1)).thenReturn(Boolean.TRUE);
+        when(productService.deleteProductById(1)).thenReturn(dummyProduct);
+
+        String expectedResponse = "Product: " + dummyProduct.getName() +", Category: "+ dummyProduct.getCategory().getName() +" has been deleted Successfully";
 
         mockMvc.perform(delete("/products/{id}",1))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedResponse));
 
     }
 
@@ -124,7 +130,7 @@ class ProductControllerTest {
         dummyRequestDTO.setImageUrl("imageUrl");
         dummyRequestDTO.setCategoryName("category");
 
-        ProductResponseDTO dummyResponseDTO = dummyProduct.convertToResponseDTO();
+        ProductResponseDTO expectedResponseDTO = dummyProduct.convertToResponseDTO();
 
 
         when(productService.createNewProduct(dummyRequestDTO.getProductName(),dummyRequestDTO.getDescription(),
@@ -137,7 +143,7 @@ class ProductControllerTest {
                                                     .content(objectMapper.writeValueAsString(dummyRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(dummyResponseDTO)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponseDTO)));
     }
 
     @Test

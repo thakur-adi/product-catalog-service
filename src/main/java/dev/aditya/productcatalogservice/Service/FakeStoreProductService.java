@@ -116,7 +116,7 @@ public class FakeStoreProductService implements ProductService {
 
 
     @Override
-    public Boolean deleteProductById(long prodId) throws ProductNotFoundException{
+    public Product deleteProductById(long prodId) throws ProductNotFoundException{
         Product product = getProductById(prodId);
         if(product==null)
         {
@@ -133,8 +133,7 @@ public class FakeStoreProductService implements ProductService {
         {
             if(fakeStoreDTOResponseEntity.getStatusCode().equals(HttpStatus.OK))
             {
-                //return fakeStoreDTOResponseEntity.getBody().convertToProduct();
-                return true;
+                return fakeStoreDTOResponseEntity.getBody().convertToProduct();
             }
             else
             {

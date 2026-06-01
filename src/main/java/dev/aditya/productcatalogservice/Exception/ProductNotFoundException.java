@@ -3,7 +3,7 @@ package dev.aditya.productcatalogservice.Exception;
 
 public class ProductNotFoundException extends Exception{
 
-    private static String message ="Product doesn't exist";
+    private static final String message ="Product doesn't exist";
     //for default message
     public ProductNotFoundException() {
         super(message);

@@ -27,4 +27,6 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     @Override
     Product save(Product product);
 
+
+    Optional<Product> findProductByNameAndCategoryName(String name, String categoryName);
 }

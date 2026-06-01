@@ -1,5 +1,6 @@
 package dev.aditya.productcatalogservice.Service;
 
+import dev.aditya.productcatalogservice.Exception.ProductAlreadyExistsException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Category;
 import dev.aditya.productcatalogservice.Model.ModelStatus;
@@ -31,8 +32,6 @@ public class StorageProductService implements ProductService {
     }
 
 
-
-
     @Override
     public List<Product> getAllProducts() throws ProductNotFoundException {
         List<Product> products = productRepo.findAll(); //Custom Query for finding active products not working for some reason. Will look into it later.
@@ -50,25 +49,24 @@ public class StorageProductService implements ProductService {
     @Override
     public Product createNewProduct(String productName, String desc, String imageUrl, double price, String categoryName)
     {
+        if(productRepo.findProductByNameAndCategoryName(productName,categoryName).isPresent())
+        {
+            throw new ProductAlreadyExistsException("Product: " + productName +", Category: "+ categoryName +" already exists");
+        }
 
         Product product = createNewProductFromParams(productName, desc, imageUrl, price, categoryName);
 
-        if(productRepo.findById(product.getId()).isPresent())
-        {
-            throw new RuntimeException("Product already exists");
-        }
         return productRepo.save(product);
     }
 
 
-
     @Override
-    public Boolean deleteProductById(long prodId) throws ProductNotFoundException {
-            Product validProduct= Validation.getValidProduct(productRepo.findById(prodId));
-            validProduct.setStatus(ModelStatus.DELETED);
-            productRepo.save(validProduct);
-            return true;
+    public Product deleteProductById(long prodId) throws ProductNotFoundException {
+            Product product = getProductById(prodId);
+            product.setStatus(ModelStatus.DELETED);
+            productRepo.save(product);
 
+            return product;
     }
 
 
