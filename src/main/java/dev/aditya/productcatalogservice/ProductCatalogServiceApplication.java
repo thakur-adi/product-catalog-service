@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 
-@SpringBootApplication(exclude  = {DataSourceAutoConfiguration.class}) // "exclude = "Disables the initialization for DB, remove it when finally decided adding a DB.
+@SpringBootApplication//(exclude  = {DataSourceAutoConfiguration.class}) // "exclude = "Disables the initialization for DB, remove it when finally decided adding a DB.
 public class ProductCatalogServiceApplication {
 
     public static void main(String[] args) {
