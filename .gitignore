@@ -11,4 +11,5 @@
 *.iml
 .postman/
 postman/
+#these are the build files not required in our repo. Everyone builds their own target
 target/
