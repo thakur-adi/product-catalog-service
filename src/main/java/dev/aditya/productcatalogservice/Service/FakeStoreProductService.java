@@ -1,7 +1,6 @@
 package dev.aditya.productcatalogservice.Service;
 
 import dev.aditya.productcatalogservice.DTO.FakeStoreDTO;
-import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Category;
 import dev.aditya.productcatalogservice.Model.Product;
@@ -9,14 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 
 //From this service class we are communicating to another 3rd party service called FakeStore. This acts as a proxy for FakeStore.
 @Service("FakeStoreProductService")
-public class FakeStoreProductService implements ProductServices {
+public class FakeStoreProductService implements ProductService {
 
     //RestTemplate restTemplate;
     RestClient restClient;
@@ -32,7 +30,7 @@ public class FakeStoreProductService implements ProductServices {
 
 
 
-//    @Autowired(required = false) (required condition is a Fail-Safe in case there is no bean for rest template it'll try injecting in the other constructor)
+//    @Autowired(required = false) (required = false condition is a Fail-Safe in case there is no bean for rest template it'll try injecting in the other constructor)
 //    FakeStoreProductService(RestTemplate restTemplate)
 //    {
 //        this.restTemplate=restTemplate;

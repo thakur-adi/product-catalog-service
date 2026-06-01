@@ -3,6 +3,7 @@ package dev.aditya.productcatalogservice.Model;
 import dev.aditya.productcatalogservice.DTO.FakeStoreDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +21,7 @@ public class Product extends Base{
 
 
     //Product to ProductResponseDTO Mapper
-    public ProductResponseDTO convertToResponseDTO()
-    {
+    public ProductResponseDTO convertToResponseDTO() {
         ProductResponseDTO productResponseDTO = new ProductResponseDTO();
         productResponseDTO.setName(this.getName());
         productResponseDTO.setDescription(this.getDescription());

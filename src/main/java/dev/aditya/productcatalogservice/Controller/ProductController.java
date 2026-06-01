@@ -5,11 +5,9 @@ import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
 import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
-import dev.aditya.productcatalogservice.Service.ProductServices;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.aditya.productcatalogservice.Service.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,17 +19,16 @@ public class ProductController {
 
 //    @Autowired
 //    @Qualifier("StorageProductService")
-    private ProductServices productServices;
+    private ProductService productService;
 
-    ProductController(@Qualifier("StorageProductService") ProductServices productServices)
-    {
-        this.productServices = productServices;
+    ProductController(@Qualifier("StorageProductService") ProductService productService) {
+        this.productService = productService;
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") long prodId) throws ProductNotFoundException {
-        Product product = productServices.getProductById(prodId);
+        Product product = productService.getProductById(prodId);
         return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.OK);
     }
 
@@ -39,7 +36,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() throws ProductNotFoundException {
-        return new ResponseEntity<>( productServices.getAllProducts()
+        return new ResponseEntity<>( productService.getAllProducts()
                                               .stream()
                                               .map(product -> product.convertToResponseDTO())
                                               .toList()
@@ -55,14 +52,14 @@ public class ProductController {
     //So I have converted all the return types to a ResponseEntity
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createNewProduct(@RequestBody ProductRequestDTO productRequestDTO) {
-        return new ResponseEntity<>(productServices.createNewProduct(productRequestDTO.getProductName(),
+        return new ResponseEntity<>(productService.createNewProduct(productRequestDTO.getProductName(),
                                                                     productRequestDTO.getDescription(),
                                                                     productRequestDTO.getImageUrl(),
                                                                     productRequestDTO.getPrice(),
                                                                     productRequestDTO.getCategoryName()
                                                                     )
                                                     .convertToResponseDTO(),
-                                    HttpStatus.OK);
+                                    HttpStatus.CREATED);
     }
 
 
@@ -72,7 +69,7 @@ public class ProductController {
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
         //Product product =productServices.deleteProductById(id);
-        if(!productServices.deleteProductById(id))
+        if(!productService.deleteProductById(id))
         {
             throw new InternalError("Some Internal issue Encountered. please try again later");
         }
@@ -83,10 +80,9 @@ public class ProductController {
 
     //To handle if Client tries to bypass without inputting any id. Spring catches it on its own and throws an error
     // Spring never lets it reach service layer. But this way we can give out a particular response instead of an Error
+    //@DeleteMapping("/") could have been used as wel but would just take care of Delete Request
     @RequestMapping(value = "/",method = {RequestMethod.GET,RequestMethod.DELETE,RequestMethod.PUT})
-    //@DeleteMapping("/")
-    public ResponseEntity<String> handleMissingId()
-    {
+    public ResponseEntity<String> handleMissingId() {
         throw new ProductIdMissingException("Please enter a valid Product Id");
     }
 

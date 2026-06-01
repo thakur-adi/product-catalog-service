@@ -25,8 +25,7 @@ public abstract class Base {
     //Always store in string which is Human Readable.
     private ModelStatus status;
 
-    public Base()
-        {
+    public Base(){
            status=ModelStatus.ACTIVE;
            createdAt=new Date();
            lastUpdatedAt=createdAt;

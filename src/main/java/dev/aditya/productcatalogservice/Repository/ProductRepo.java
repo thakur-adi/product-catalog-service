@@ -26,4 +26,5 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     //Its smart enough to understand whether we want to create a new product or update an existing one.
     @Override
     Product save(Product product);
+
 }

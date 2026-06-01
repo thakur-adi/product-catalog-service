@@ -6,6 +6,7 @@ import dev.aditya.productcatalogservice.Model.ModelStatus;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Repository.CategoryRepo;
 import dev.aditya.productcatalogservice.Repository.ProductRepo;
+import dev.aditya.productcatalogservice.Validation.Validation;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -13,23 +14,20 @@ import java.util.Optional;
 
 
 @Service("StorageProductService")
-public class StorageProductService implements ProductServices {
+public class StorageProductService implements ProductService {
 
     private ProductRepo productRepo;
     private CategoryRepo categoryRepo;
 
-    StorageProductService(ProductRepo productRepo,CategoryRepo categoryRepo)
-    {
+    StorageProductService(ProductRepo productRepo,CategoryRepo categoryRepo){
         this.productRepo=productRepo;
         this.categoryRepo=categoryRepo;
     }
 
 
-
-
     @Override
     public Product getProductById(long prodId) throws ProductNotFoundException {
-        return getValidProduct(productRepo.findById(prodId));
+        return Validation.getValidProduct(productRepo.findById(prodId));
     }
 
 
@@ -50,7 +48,8 @@ public class StorageProductService implements ProductServices {
 
 
     @Override
-    public Product createNewProduct(String productName, String desc, String imageUrl, double price, String categoryName) {
+    public Product createNewProduct(String productName, String desc, String imageUrl, double price, String categoryName)
+    {
 
         Product product = createNewProductFromParams(productName, desc, imageUrl, price, categoryName);
 
@@ -65,7 +64,7 @@ public class StorageProductService implements ProductServices {
 
     @Override
     public Boolean deleteProductById(long prodId) throws ProductNotFoundException {
-            Product validProduct= getValidProduct(productRepo.findById(prodId));
+            Product validProduct= Validation.getValidProduct(productRepo.findById(prodId));
             validProduct.setStatus(ModelStatus.DELETED);
             productRepo.save(validProduct);
             return true;
@@ -81,14 +80,14 @@ public class StorageProductService implements ProductServices {
     //Helper Method for creating a Product Model Object
     private Product createNewProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
     {
-        //try to move it to a builder class next
+        //try to move it to a builder class next -> can't as it contains some parent fields as well, which can't be set from child class.
         Product product = new Product();
         product.setName(productName);
         product.setDescription(desc);
         product.setImageUrl(imageURL);
         product.setPrice(price);
         //It's a nested Property i.e. product has a separate 'category' class attribute that means a product cannot be added if the category doesn't exist first.
-        // It'll always fail as it demands the category to be present. That's why we first update category table then add the product.
+        //It'll always fail as it demands the category to be present. That's why we first update category table then add the product.
         Optional<Category> optionalCategory = categoryRepo.findbyName(categoryName);
         if(optionalCategory.isEmpty())
         {
@@ -101,12 +100,13 @@ public class StorageProductService implements ProductServices {
         else {
             product.setCategory(optionalCategory.get());
         }
-        //I fwe don't perform this product addition to the  table i.e. post/put api will fail.
+        //If we don't perform this product addition to the  table i.e. post/put api will fail.
         return product;
     }
 
 
-
+/*
+    //Moved to Validations class
     //This performs various checks on Product object before it gets sent to controller
     private Product getValidProduct(Optional<Product> optionalProduct) throws ProductNotFoundException{
         if(optionalProduct.isEmpty())
@@ -118,4 +118,5 @@ public class StorageProductService implements ProductServices {
         }
         return optionalProduct.get();
     }
+ */
 }

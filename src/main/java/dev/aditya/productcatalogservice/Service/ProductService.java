@@ -1,12 +1,11 @@
 package dev.aditya.productcatalogservice.Service;
 
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
-import dev.aditya.productcatalogservice.Model.Category;
 import dev.aditya.productcatalogservice.Model.Product;
 
 import java.util.List;
 
-public interface ProductServices {
+public interface ProductService {
 
     Product getProductById(long prodId) throws ProductNotFoundException;
 
