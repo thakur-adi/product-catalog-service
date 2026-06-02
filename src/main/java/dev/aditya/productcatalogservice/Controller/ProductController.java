@@ -68,12 +68,9 @@ public class ProductController {
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
-        //Product product =productServices.deleteProductById(id);
-        if(!productService.deleteProductById(id))
-        {
-            throw new InternalError("Some Internal issue Encountered. please try again later");
-        }
-        return new ResponseEntity<>("Object Deleted Successfully",HttpStatus.OK);
+        Product product = productService.deleteProductById(id);
+        return new ResponseEntity<>( "Product: " + product.getName() +", Category: "+ product.getCategory().getName() +" has been deleted Successfully",
+                                    HttpStatus.OK);
     }
 
 
