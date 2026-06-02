@@ -152,9 +152,19 @@ public class FakeStoreProductService implements ProductService {
 
 
     }
-    
 
- //Helper Method for creating a model Object
+
+    //Not Required to Implement
+    @Override
+    public Product updateProductById(long prodId, String productName, String description, String imageUrl, double price, String categoryName) throws ProductNotFoundException {
+        return null;
+    }
+
+
+
+
+
+    //Helper Method for creating a model Object
     private Product createProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
     {
         Product product = new Product();

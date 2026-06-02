@@ -110,7 +110,7 @@ class ProductControllerTest {
 
         when(productService.deleteProductById(1)).thenReturn(dummyProduct);
 
-        String expectedResponse = "Product: " + dummyProduct.getName() +", Category: "+ dummyProduct.getCategory().getName() +" has been deleted Successfully";
+        String expectedResponse = "Product: " + dummyProduct.getName() +"of Category: "+ dummyProduct.getCategory().getName() +" has been deleted Successfully";
 
         mockMvc.perform(delete("/products/{id}",1))
                 .andExpect(status().isOk())

@@ -63,13 +63,23 @@ public class ProductController {
     }
 
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> updateProductById(@PathVariable("id") long prodId,
+                                                             @RequestBody ProductRequestDTO productRequestDTO) throws ProductNotFoundException {
+        Product product = productService.updateProductById(prodId,
+                                                           productRequestDTO.getProductName(),
+                                                           productRequestDTO.getDescription(),
+                                                           productRequestDTO.getImageUrl(),
+                                                           productRequestDTO.getPrice(),
+                                                           productRequestDTO.getCategoryName());
+        return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.OK);
+    }
 
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
         Product product = productService.deleteProductById(id);
-        return new ResponseEntity<>( "Product: " + product.getName() +", Category: "+ product.getCategory().getName() +" has been deleted Successfully",
+        return new ResponseEntity<>( "Product: " + product.getName() +" of Category: "+ product.getCategory().getName() +" has been deleted Successfully",
                                     HttpStatus.OK);
     }
 

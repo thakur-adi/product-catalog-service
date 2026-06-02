@@ -59,6 +59,12 @@ public class StorageProductService implements ProductService {
         return productRepo.save(product);
     }
 
+    @Override
+    public Product updateProductById(long prodId, String productName, String description, String imageUrl, double price, String categoryName) throws ProductNotFoundException {
+        Product product =  Validation.getValidProduct(productRepo.findById(prodId));
+        return null;
+    }
+
 
     @Override
     public Product deleteProductById(long prodId) throws ProductNotFoundException {
@@ -68,10 +74,6 @@ public class StorageProductService implements ProductService {
 
             return product;
     }
-
-
-
-
 
 
 
