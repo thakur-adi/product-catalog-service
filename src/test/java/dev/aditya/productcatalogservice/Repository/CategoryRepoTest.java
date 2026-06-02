@@ -9,7 +9,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
+//This is an Integration test not a Unit Test. We never run Unit Tests on Repository
+@DataJpaTest //automatically marks every single @Test method in your class as @Transactional. It doesn't strictly need H2 db, but is preferred
 class CategoryRepoTest {
 
     @Autowired

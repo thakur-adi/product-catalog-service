@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 //This is an Integration test not a Unit Test. We never run Unit Tests on Repository
-@DataJpaTest //automatically marks every single @Test method in your class as @Transactional. It needs H2 db
+@DataJpaTest //automatically marks every single @Test method in your class as @Transactional. It doesn't strictly need H2 db, but is preferred
 class ProductRepoTest {
 
     @Autowired
