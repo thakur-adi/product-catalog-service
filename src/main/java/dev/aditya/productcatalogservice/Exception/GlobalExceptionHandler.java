@@ -1,10 +1,13 @@
 package dev.aditya.productcatalogservice.Exception;
 
+import jakarta.transaction.NotSupportedException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 /*
 This is an Advisor Class. As the name suggests this handles all the exceptions defined in the project at  one place.
@@ -32,10 +35,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<String> handleWrongResourceInput(NoResourceFoundException e){
-        return  new ResponseEntity<>("The requested endpoint does not exist. Please verify the URL and HTTP method.",
+    public ResponseEntity<String> handleWrongResourceException(NoResourceFoundException e){
+        return  new ResponseEntity<>("The requested address does not exist. Please verify the URL and HTTP method and try again!!",
                                     HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<String> handleWrongRequestMethodException(HttpRequestMethodNotSupportedException e){
+        return  new ResponseEntity<>("The requested method is not supported. Please verify the URL and HTTP method and try again!!",
+                HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+
+
 
     //Custom Exceptions
 
@@ -51,9 +63,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ResponseEntity<String> handleProductAlreadyExists(ProductAlreadyExistsException e)
-    {
-
+    public ResponseEntity<String> handleProductAlreadyExists(ProductAlreadyExistsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 
 }

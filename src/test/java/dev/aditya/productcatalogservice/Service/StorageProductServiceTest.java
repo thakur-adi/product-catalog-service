@@ -159,6 +159,41 @@ class StorageProductServiceTest {
 
     //Happy path
     @Test
+    void testUpdateProductReturnsProduct() throws ProductNotFoundException {
+        //Arrange
+        Optional<Product> dummyProductOptional = Optional.of(dummyProduct);
+        //This(when()) only works with mocked Objects not real objects like productService.getById(1) will fail.
+        // It would use the original object since "productService" is not mocked, and would give the actual result instead of using when().thenReturn()(this method won't get used at all).
+        when(productRepo.findById(1L)).thenReturn(dummyProductOptional);
+
+        when(productRepo.save(any())).thenReturn(dummyProduct);
+
+        //Act
+        Product expectedProduct = productService.updateProductById(1,dummyProduct.getName(), dummyProduct.getDescription(),
+                                                                    dummyProduct.getImageUrl(), dummyProduct.getPrice(),
+                                                                    dummyProduct.getCategory().getName());
+
+        //Assert
+        assertEquals(1,expectedProduct.getId());
+        assertEquals("Dummy Product",expectedProduct.getName());
+        assertEquals(dummyProduct,expectedProduct);
+    }
+
+    //Unhappy path
+    @Test
+    void testUpdateProductThrowsException(){
+        //Arrange
+        when(productRepo.findProductByNameAndCategoryName("name","categoryName")).thenReturn(Optional.of(dummyProduct));
+
+        //Act and Assert
+        assertThrows(ProductNotFoundException.class,
+                ()->productService.updateProductById(1,"name","desc","image",10.0,"categoryName"));
+
+    }
+
+
+    //Happy path
+    @Test
     void testDeleteProductByIdReturnsString() throws ProductNotFoundException {
         //Arrange
         //Product dummyProduct = createNewDummyProduct();

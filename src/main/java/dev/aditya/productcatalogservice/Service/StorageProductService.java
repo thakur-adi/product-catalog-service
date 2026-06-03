@@ -78,7 +78,7 @@ public class StorageProductService implements ProductService {
 
 
 
-    //Helper Methods
+    /*Helper Methods*/
 
     // for creating a Product Model Object
     private Product buildNewProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)

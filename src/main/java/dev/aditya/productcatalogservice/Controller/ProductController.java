@@ -2,7 +2,6 @@ package dev.aditya.productcatalogservice.Controller;
 
 import dev.aditya.productcatalogservice.DTO.ProductRequestDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
-import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductService;
@@ -74,7 +73,7 @@ public class ProductController {
                                                            productRequestDTO.getImageUrl(),
                                                            productRequestDTO.getPrice(),
                                                            productRequestDTO.getCategoryName());
-        return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.OK);
+        return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.ACCEPTED);
     }
 
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
