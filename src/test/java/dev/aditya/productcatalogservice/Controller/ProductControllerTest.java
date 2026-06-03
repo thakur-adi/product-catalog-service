@@ -110,7 +110,7 @@ class ProductControllerTest {
 
         when(productService.deleteProductById(1)).thenReturn(dummyProduct);
 
-        String expectedResponse = "Product: " + dummyProduct.getName() +", Category: "+ dummyProduct.getCategory().getName() +" has been deleted Successfully";
+        String expectedResponse = "Product: " + dummyProduct.getName() +"of Category: "+ dummyProduct.getCategory().getName() +" has been deleted Successfully";
 
         mockMvc.perform(delete("/products/{id}",1))
                 .andExpect(status().isOk())
@@ -147,18 +147,31 @@ class ProductControllerTest {
     }
 
     @Test
-    void testHandleMissingIdRunsSuccessfully() throws Exception {
+    void testUpdateProductByIdRunsSuccessfully() throws Exception {
         //Arrange
-        //Since there's nothing to mock here we just act and assert.
-        HttpMethod[] httpMethods = {HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT};
-        //Act and Assert
-        for(HttpMethod method: httpMethods)
-        {
-            mockMvc.perform(request(method,"/products/"))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().string("Please enter a valid Product Id"));
-        }
+        Product dummyProduct = createNewDummyProduct("Dummy for Create() Method");
 
+        ProductRequestDTO dummyRequestDTO = new ProductRequestDTO();
+        dummyRequestDTO.setProductName("Dummy Request DTO");
+        dummyRequestDTO.setDescription("desc");
+        dummyRequestDTO.setPrice(100);
+        dummyRequestDTO.setImageUrl("imageUrl");
+        dummyRequestDTO.setCategoryName("category");
+
+        ProductResponseDTO expectedResponseDTO = dummyProduct.convertToResponseDTO();
+
+
+        when(productService.updateProductById(1, dummyRequestDTO.getProductName(),dummyRequestDTO.getDescription(),
+                dummyRequestDTO.getImageUrl(),dummyRequestDTO.getPrice(),dummyRequestDTO.getCategoryName()))
+                .thenReturn(dummyProduct);
+
+        //Act and Assert
+        mockMvc.perform(put("/products/{id}",1).contentType(MediaType.APPLICATION_JSON)
+                        //We'll have to pass payload as a string.It onl works with String it seems
+                        .content(objectMapper.writeValueAsString(dummyRequestDTO)))
+                .andExpect(status().isAccepted())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponseDTO)));
     }
 
 }

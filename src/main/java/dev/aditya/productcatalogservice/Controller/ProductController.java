@@ -2,7 +2,6 @@ package dev.aditya.productcatalogservice.Controller;
 
 import dev.aditya.productcatalogservice.DTO.ProductRequestDTO;
 import dev.aditya.productcatalogservice.DTO.ProductResponseDTO;
-import dev.aditya.productcatalogservice.Exception.ProductIdMissingException;
 import dev.aditya.productcatalogservice.Exception.ProductNotFoundException;
 import dev.aditya.productcatalogservice.Model.Product;
 import dev.aditya.productcatalogservice.Service.ProductService;
@@ -63,25 +62,29 @@ public class ProductController {
     }
 
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> updateProductById(@PathVariable("id") long prodId,
+                                                                @RequestBody ProductRequestDTO productRequestDTO)
+                                                                throws ProductNotFoundException
+    {
+        Product product = productService.updateProductById(prodId,
+                                                           productRequestDTO.getProductName(),
+                                                           productRequestDTO.getDescription(),
+                                                           productRequestDTO.getImageUrl(),
+                                                           productRequestDTO.getPrice(),
+                                                           productRequestDTO.getCategoryName());
+        return new ResponseEntity<>(product.convertToResponseDTO(),HttpStatus.ACCEPTED);
+    }
 
     //Again Delete operation has a void return type, to give out proper response with a message we wrap it into a response entity with status as 'ok'
     @DeleteMapping("/{Id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("Id") long id) throws ProductNotFoundException {
         Product product = productService.deleteProductById(id);
-        return new ResponseEntity<>( "Product: " + product.getName() +", Category: "+ product.getCategory().getName() +" has been deleted Successfully",
+        return new ResponseEntity<>( "Product: " + product.getName() +" of Category: "+ product.getCategory().getName() +" has been deleted Successfully",
                                     HttpStatus.OK);
     }
 
 
-
-    //To handle if Client tries to bypass without inputting any id. Spring catches it on its own and throws an error
-    // Spring never lets it reach service layer. But this way we can give out a particular response instead of an Error
-    //@DeleteMapping("/") could have been used as wel but would just take care of Delete Request
-    @RequestMapping(value = "/",method = {RequestMethod.GET,RequestMethod.DELETE,RequestMethod.PUT})
-    public ResponseEntity<String> handleMissingId() {
-        throw new ProductIdMissingException("Please enter a valid Product Id");
-    }
 
 
 
