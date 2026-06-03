@@ -54,17 +54,18 @@ public class StorageProductService implements ProductService {
             throw new ProductAlreadyExistsException("Product: " + productName +", Category: "+ categoryName +" already exists");
         }
 
-        Product product = createNewProductFromParams(productName, desc, imageUrl, price, categoryName);
+        Product product = buildNewProductFromParams(productName, desc, imageUrl, price, categoryName);
 
         return productRepo.save(product);
     }
 
     @Override
     public Product updateProductById(long prodId, String productName, String description, String imageUrl, double price, String categoryName) throws ProductNotFoundException {
-        Product product =  Validation.getValidProduct(productRepo.findById(prodId));
-        return null;
+        Product currentProduct =  getProductById(prodId);
+        Product newProduct = buildNewProductFromParams(productName, description, imageUrl, price, categoryName);
+        newProduct.setId(currentProduct.getId());
+        return productRepo.save(newProduct);
     }
-
 
     @Override
     public Product deleteProductById(long prodId) throws ProductNotFoundException {
@@ -77,8 +78,10 @@ public class StorageProductService implements ProductService {
 
 
 
-    //Helper Method for creating a Product Model Object
-    private Product createNewProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
+    //Helper Methods
+
+    // for creating a Product Model Object
+    private Product buildNewProductFromParams(String productName, String desc, String imageURL, double price, String categoryName)
     {
         //try to move it to a builder class next -> can't as it contains some parent fields as well, which can't be set from child class.
         Product product = new Product();
@@ -86,23 +89,34 @@ public class StorageProductService implements ProductService {
         product.setDescription(desc);
         product.setImageUrl(imageURL);
         product.setPrice(price);
-        //It's a nested Property i.e. product has a separate 'category' class attribute that means a product cannot be added if the category doesn't exist first.
+        //It's a nested Property i.e. product has a separate 'category' class attribute, that means a product cannot be added if the category doesn't exist first.
         //It'll always fail as it demands the category to be present. That's why we first update category table then add the product.
+        product.setCategory(getCategoryFromDB(categoryName));
+
+        return product;
+    }
+
+    // for creating a Category Model Object in case it doesn't exist
+    private Category getCategoryFromDB(String categoryName)
+    {
+        //If we don't perform this product addition to the table i.e. post/put api will fail.
         Optional<Category> optionalCategory = categoryRepo.findbyName(categoryName);
         if(optionalCategory.isEmpty())
         {
-           //try to move this to a builder
-           Category category = new Category();
-           category.setName(categoryName);
-           categoryRepo.save(category);
-           product.setCategory(category);
+            //try to move this to a builder
+            Category category = new Category();
+            category.setName(categoryName);
+            categoryRepo.save(category);
+           return category;
         }
         else {
-            product.setCategory(optionalCategory.get());
+            return optionalCategory.get();
         }
-        //If we don't perform this product addition to the  table i.e. post/put api will fail.
-        return product;
     }
+
+
+
+
 
 
 /*

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 /*
 This is an Advisor Class. As the name suggests this handles all the exceptions defined in the project at  one place.
 Helps us by eliminating unnecessary try{}catch{} code everywhere, Spring handles all that on its own
@@ -30,18 +31,29 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Please enter a valid address and try again later!",HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handleWrongResourceInput(NoResourceFoundException e){
+        return  new ResponseEntity<>("The requested endpoint does not exist. Please verify the URL and HTTP method.",
+                                    HttpStatus.NOT_FOUND);
+    }
 
     //Custom Exceptions
 
     @ExceptionHandler(ProductIdMissingException.class)
     public ResponseEntity<String> handleProductIdMissingException(ProductIdMissingException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
     }
 
 
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException e){
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<String> handleProductAlreadyExists(ProductAlreadyExistsException e)
+    {
+
     }
 
 }

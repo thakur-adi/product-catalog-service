@@ -146,19 +146,4 @@ class ProductControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResponseDTO)));
     }
 
-    @Test
-    void testHandleMissingIdRunsSuccessfully() throws Exception {
-        //Arrange
-        //Since there's nothing to mock here we just act and assert.
-        HttpMethod[] httpMethods = {HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT};
-        //Act and Assert
-        for(HttpMethod method: httpMethods)
-        {
-            mockMvc.perform(request(method,"/products/"))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().string("Please enter a valid Product Id"));
-        }
-
-    }
-
 }

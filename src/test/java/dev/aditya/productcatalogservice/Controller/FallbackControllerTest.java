@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(RootController.class)
-class RootControllerTest {
+@WebMvcTest(FallbackController.class)
+class FallbackControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,4 +28,20 @@ class RootControllerTest {
                     .andExpect(content().string("Please enter a valid address and try again later!"));
         }
     }
+
+    @Test
+    void testHandleMissingIdRunsSuccessfully() throws Exception {
+        //Arrange
+        //Since there's nothing to mock here we just act and assert.
+        HttpMethod[] httpMethods = {HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT};
+        //Act and Assert
+        for(HttpMethod method: httpMethods)
+        {
+            mockMvc.perform(request(method,"/products/"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("Please enter a valid Product Id"));
+        }
+
+    }
+
 }

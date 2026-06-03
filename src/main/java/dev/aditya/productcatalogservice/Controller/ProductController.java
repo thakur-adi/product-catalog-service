@@ -65,7 +65,9 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProductById(@PathVariable("id") long prodId,
-                                                             @RequestBody ProductRequestDTO productRequestDTO) throws ProductNotFoundException {
+                                                                @RequestBody ProductRequestDTO productRequestDTO)
+                                                                throws ProductNotFoundException
+    {
         Product product = productService.updateProductById(prodId,
                                                            productRequestDTO.getProductName(),
                                                            productRequestDTO.getDescription(),
@@ -84,14 +86,6 @@ public class ProductController {
     }
 
 
-
-    //To handle if Client tries to bypass without inputting any id. Spring catches it on its own and throws an error
-    // Spring never lets it reach service layer. But this way we can give out a particular response instead of an Error
-    //@DeleteMapping("/") could have been used as wel but would just take care of Delete Request
-    @RequestMapping(value = "/",method = {RequestMethod.GET,RequestMethod.DELETE,RequestMethod.PUT})
-    public ResponseEntity<String> handleMissingId() {
-        throw new ProductIdMissingException("Please enter a valid Product Id");
-    }
 
 
 
